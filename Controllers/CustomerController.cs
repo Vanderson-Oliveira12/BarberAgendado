@@ -1,5 +1,6 @@
 ﻿using BarberAgendado.Domain.DTOs;
 using BarberAgendado.Domain.DTOs.CustomerDTOs;
+using BarberAgendado.Domain.DTOs.Customers;
 using BarberAgendado.Domain.Models;
 using BarberAgendado.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -41,21 +42,29 @@ namespace BarberAgendado.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var customer =await _customerService.CreateAsync(payload);
+            var customer = await _customerService.CreateAsync(payload);
 
             return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
         }
 
-        // PUT api/<CustomerController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<ApiResponse>> Put(string id, [FromBody] CustomerUpdateDTO payload)
         {
+            if (id is null) return BadRequest(ApiResponse.Error("Id não pode ser nulo", 400));
+
+            var updatedData = await _customerService.UpdateAsync(id, payload);
+
+            return Ok(ApiResponse.Success(updatedData));
         }
 
-        // DELETE api/<CustomerController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> Delete(string id)
         {
+            if (id is null) return BadRequest(ApiResponse.Error("Id não pode ser nulo", 400));
+
+            await _customerService.DeleteAsync(id);
+
+            return NoContent();
         }
     }
 }

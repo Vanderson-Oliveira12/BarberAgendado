@@ -16,8 +16,10 @@ builder.AddDbContextConfig();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBarberRepository, BarberRepository>();
 
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<BarberService>();
 
 var app = builder.Build();
 
