@@ -17,6 +17,9 @@ namespace BarberAgendado.Data.Configuration
            .HasColumnType("decimal(19,2)")
            .IsRequired();
 
+            builder.HasIndex(s => s.Name)
+                .IsUnique();
+
             builder.Property(s => s.Duration).IsRequired();
         }
     }

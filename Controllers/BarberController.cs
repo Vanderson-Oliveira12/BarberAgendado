@@ -28,11 +28,11 @@ namespace BarberAgendado.Controllers
 
         [HttpGet("{id}")]
         [ActionName(nameof(GetByIdAsync))]
-        public async Task<ActionResult> GetByIdAsync(string id)
+        public async Task<ActionResult<ApiResponse>> GetByIdAsync(string id)
         {
             var barber = await _barberService.GetByIdAsync(id);
 
-            return barber != null ? Ok(barber) : NotFound(); 
+            return barber != null ? Ok(ApiResponse.Success(barber)) : NotFound(ApiResponse.Error("Barbeiro não encontrado"));
         }
 
         [HttpPost]
@@ -41,6 +41,26 @@ namespace BarberAgendado.Controllers
             var createdBarber = await _barberService.CreateAsync(payload);
 
             return CreatedAtAction(nameof(GetByIdAsync), new { id = createdBarber.Id }, createdBarber);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<ApiResponse>> UpdateAsync(string id, [FromBody] BarberUpdateDTO dto)
+        {
+            if (id is null) return BadRequest(ApiResponse.Error("Id não pode ser nulo", 400));
+
+            var updatedData = await _barberService.UpdateAsync(id, dto);
+
+            return Ok(ApiResponse.Success(updatedData));
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> DeleteAsync(string id)
+        {
+            if (id is null) return BadRequest(ApiResponse.Error("Id não pode ser nulo", 400));
+
+            await _barberService.RemoveAsync(id);
+
+            return NoContent();
         }
 
     }
